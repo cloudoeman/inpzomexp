@@ -1,3 +1,18 @@
+const zoexDefalut = {
+  settings: {
+    enabled: true, // default enabled
+    emoji: 3,
+    img: 1,
+    video: 1,
+    link: 1,
+    blue: 1,
+    replyTime: 3,
+    mixTrendWord: 3,
+    blacklist: '/^[\u0900-\u097f\u2600-\u26FF]+$/', // default blacklist
+  }
+}
+
+
 const DEBUG_LEVEL = {
   NONE: 0,
   ERROR: 1,
@@ -12,9 +27,9 @@ const debug = {
     if (level <= debug.level) {
       if (level === DEBUG_LEVEL.ERROR) {
         console.error(`[${level}] ${message}`);
-      } else if(level === DEBUG_LEVEL.WARN) {
+      } else if (level === DEBUG_LEVEL.WARN) {
         console.warn(`[${level}] ${message}`);
-      } else if(level === DEBUG_LEVEL.INFO) {
+      } else if (level === DEBUG_LEVEL.INFO) {
         console.info(`[${level}] %c${message}`, `color: ${color};`);
       } else {
         console.log(`[${level}] ${message}`);
@@ -30,8 +45,8 @@ const observeObject = {
   isUrl: undefined,
   category: undefined,
 
-  
-  mutationUrl: async function(mutations) {
+
+  mutationUrl: async function (mutations) {
     const isUrl = location.href;
     if (isUrl !== systemFunc.preUrl) {
       // reply or trend or (other URL -> disconnect)
@@ -42,7 +57,7 @@ const observeObject = {
         replyObjects.tweetTextList = {};
 
         // reply URL
-      } else if (systemFunc.TIMELINEURL.test(isUrl)) {        
+      } else if (systemFunc.TIMELINEURL.test(isUrl)) {
         systemFunc.preUrl = isUrl;
         this.category = 'reply';
         this.observeStart(isUrl);
@@ -52,7 +67,7 @@ const observeObject = {
         systemFunc.preUrl = isUrl;
         this.category = 'trend';
         this.observeStart(isUrl);
-        
+
         // get trendWords
       } else if (systemFunc.TRENDWORDS.test(isUrl)) {
         if (systemFunc.preUrl !== isUrl && systemFunc.preUrl === undefined) {
@@ -67,7 +82,7 @@ const observeObject = {
     }
   },
 
-  mutationList: function(mutationList) {
+  mutationList: function (mutationList) {
     if (this.flag) {
       mutationList.forEach(async (mutation) => {
         if (mutation.addedNodes.length > 0 && this.flag) {
@@ -82,9 +97,9 @@ const observeObject = {
     }
   },
 
-  observeStart: async function(isUrl) {
+  observeStart: async function (isUrl) {
     debug.log(DEBUG_LEVEL.INFO, `${this.category}\nstart observe:${isUrl}`);
-    await systemFunc.loadWait(systemFunc.getElmByDataTestIdTIME);       
+    await systemFunc.loadWait(systemFunc.getElmByDataTestIdTIME);
     systemFunc.getElementByDataTestId();
     this.observer.observe(systemFunc.tweetsParent, this.config);
   }
@@ -101,9 +116,9 @@ const systemFunc = {
   tweetsParent: undefined,
   tweetsList: undefined,
   preUrl: undefined,
-  
 
-  getElementByDataTestId: function() {
+
+  getElementByDataTestId: function () {
     const timeLineChild = this.document1.querySelector('[data-testid="cellInnerDiv"]');
     if (timeLineChild) {
       debug.log(DEBUG_LEVEL.DEBUG, 'get timeLineChild');
@@ -114,7 +129,7 @@ const systemFunc = {
     }
   },
 
-  loadWait: async function(ms) {
+  loadWait: async function (ms) {
     await new Promise((resolve) => {
       setTimeout(() => {
         resolve();
@@ -122,18 +137,18 @@ const systemFunc = {
     });
   },
 
-  restart: function() {
+  restart: function () {
     //debug.log(DEBUG_LEVEL.INFO, 'rescanning', 'blue');
     console.info('%crescanning', 'font-weight: bold;');
 
-    if(deleteObjects.delIdList) {
+    if (deleteObjects.delIdList) {
       deleteObjects.delIdList.forEach(idName => {
         console.log(deleteObjects.delIdList);
         console.log(`deleted:${idName}`);
         deleteObjects.delTweet(idName);
-    });
+      });
     }
-    
+
     if (replyObjects.idCntList) {
       replyObjects.idCntList = {};
     }
@@ -144,7 +159,7 @@ const systemFunc = {
     deleteObjects.delId();
     debug.log(DEBUG_LEVEL.INFO, `finished`);
   },
-  
+
   dataSet: function (TlLists) {
     TlLists.forEach((TlList, lisNum) => {
       //Excluding only tweet host.
@@ -156,7 +171,7 @@ const systemFunc = {
         this.tweetTexts(TlList, usrId);
         replyObjects.imgCheck(TlList);
         replyObjects.linkCheck(TlList);
-        replyObjects.blueCheck(TlList,usrId);      
+        replyObjects.blueCheck(TlList, usrId);
         this.addar(usrId);
       }
     });
@@ -179,8 +194,8 @@ const systemFunc = {
     }
   },
 
-          
-    addar: function (usrId) {
+
+  addar: function (usrId) {
     if (usrId in replyObjects.idCntList) {
       replyObjects.idCntList[usrId]++;
     } else {
@@ -296,7 +311,7 @@ const trendObjects = {
 const deleteObjects = {
   REPLYTIME: 3,
   delIdList: [],
-  
+
   delId: function () {
     Object.keys(replyObjects.idCntList).forEach(idName => {
       if (replyObjects.idCntList[idName] >= this.REPLYTIME) {
