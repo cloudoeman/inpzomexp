@@ -1,0 +1,12 @@
+{
+  "name": "impression zombie explosion",
+  "description": "インプレゾンビ爆破",
+  "version": "0.14.1",
+  "manifest_version": 3,
+  "content_scripts": [
+    {
+      "matches": ["*://x.com/*"],
+      "js": ["content_script.js"]
+    }
+  ]
+}
