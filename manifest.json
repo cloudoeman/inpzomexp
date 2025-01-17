@@ -1,7 +1,7 @@
 {
   "name": "impression zombie explosion",
   "description": "インプレゾンビ爆破",
-  "version": "0.14.1",
+  "version": "0.23",
   "manifest_version": 3,
   "content_scripts": [
     {
