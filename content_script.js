@@ -125,15 +125,22 @@ const systemFunc = {
   restart: function() {
     //debug.log(DEBUG_LEVEL.INFO, 'rescanning', 'blue');
     console.info('%crescanning', 'font-weight: bold;');
-    deleteObjects.delIdList.forEach(idName => {
-      deleteObjects.delTweet(idName);
+
+    if(deleteObjects.delIdList) {
+      deleteObjects.delIdList.forEach(idName => {
+        console.log(deleteObjects.delIdList);
+        console.log(`deleted:${idName}`);
+        deleteObjects.delTweet(idName);
     });
+    }
+    
     if (replyObjects.idCntList) {
       replyObjects.idCntList = {};
     }
     systemFunc.dataSet(this.tweetsList);
-    debug.log(DEBUG_LEVEL.DEBUG, `idCntList:${replyObjects.idCntList}`);
-    debug.log(DEBUG_LEVEL.INFO, `tweetTextList:${replyObjects.tweetTextList}`);
+    //debug.log(DEBUG_LEVEL.DEBUG, `idCntList:${replyObjects.idCntList}`);
+    console.log(replyObjects.idCntList);
+    console.log(replyObjects.tweetTextList);
     deleteObjects.delId();
     debug.log(DEBUG_LEVEL.INFO, `finished`);
   },
@@ -141,12 +148,17 @@ const systemFunc = {
   dataSet: function (TlLists) {
     TlLists.forEach((TlList, lisNum) => {
       //Excluding only tweet host.
-      if (lisNum <= 2 && observeObject.category === 'reply') {
+      if (lisNum <= 1 && observeObject.category === 'reply') {
         return;
       }
       const usrId = this.setId(TlList);
-      this.tweetTexts(TlList, usrId);
-      this.addar(usrId);
+      if (usrId) {
+        this.tweetTexts(TlList, usrId);
+        replyObjects.imgCheck(TlList);
+        replyObjects.linkCheck(TlList);
+        replyObjects.blueCheck(TlList,usrId);      
+        this.addar(usrId);
+      }
     });
   },
 
@@ -158,11 +170,11 @@ const systemFunc = {
         let usrId = UsrIdEl.getAttribute('href');
         usrId = usrId.replace(/^\//g, '');
         if (!replyEl.querySelector(`[data-xusrid="${usrId}"]`)) {
-          TlList.dataset.xusrid = usrId;// Set custom data attribute with user ID
+          replyEl.dataset.xusrid = usrId;// Set custom data attribute with user ID
           return usrId;
-        } else {
-          debug.log(DEBUG_LEVEL.ERROR, 'UsrIdEl is Null');
         }
+      } else {
+        debug.log(DEBUG_LEVEL.ERROR, 'UsrIdEl is Null');
       }
     }
   },
@@ -184,9 +196,6 @@ const systemFunc = {
       if (emojiStr) {
         replyText = tweetText + emojiStr;
       }
-      replyObjects.imgCheck(tlList);
-      replyObjects.linkCheck(tlList);
-      replyObjects.blueCheck(tlList,usrId);
       if (!replyObjects.tweetTextList[usrId]) {
         replyObjects.tweetTextList[usrId] = [replyText];
       } else if (!replyObjects.tweetTextList[usrId].includes(replyText)) {
@@ -291,8 +300,8 @@ const deleteObjects = {
   delId: function () {
     Object.keys(replyObjects.idCntList).forEach(idName => {
       if (replyObjects.idCntList[idName] >= this.REPLYTIME) {
-      debug.log(DEBUG_LEVEL.INFO, `deltweet:${idName}`);
-      this.delTweet(idName);
+        debug.log(DEBUG_LEVEL.INFO, `delID:${idName}`);
+        this.delTweet(idName);
         if (!this.delIdList.includes(idName)) {
           this.delIdList.push(idName);
         }
