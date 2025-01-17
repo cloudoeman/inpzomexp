@@ -131,39 +131,44 @@ const systemFunc = {
     if (replyObjects.idCntList) {
       replyObjects.idCntList = {};
     }
-    systemFunc.dataSetId(this.tweetsList);
+    systemFunc.dataSet(this.tweetsList);
     debug.log(DEBUG_LEVEL.DEBUG, `idCntList:${replyObjects.idCntList}`);
     debug.log(DEBUG_LEVEL.INFO, `tweetTextList:${replyObjects.tweetTextList}`);
     deleteObjects.delId();
     debug.log(DEBUG_LEVEL.INFO, `finished`);
   },
-
-  //DOMにuser ID追加する
-  dataSetId: function (TlLists) {
+  
+  dataSet: function (TlLists) {
     TlLists.forEach((TlList, lisNum) => {
       //Excluding only tweet host.
       if (lisNum <= 2 && observeObject.category === 'reply') {
         return;
       }
-      if (TlList.querySelector('[role=link]')) {
-        const UsrIdEl = TlList.querySelector('a[href^="/"]');
-        if (UsrIdEl) {
-          // Set custom data attribute with user ID
-          let usrId = UsrIdEl.getAttribute('href');
-          usrId = usrId.replace(/^\//g, '');
-          this.tweetTexts(TlList, usrId);
-          if (!TlList.querySelector(`[data-xusrid="${usrId}"]`)) {
-            TlList.dataset.xusrid = usrId;
-            this.addar(usrId);
-          }
+      const usrId = this.setId(TlList);
+      this.tweetTexts(TlList, usrId);
+      this.addar(usrId);
+    });
+  },
+
+  // Set custom data attribute with user ID
+  setId: function (replyEl) {
+    if (replyEl.querySelector('[role=link]')) {
+      const UsrIdEl = replyEl.querySelector('a[href^="/"]');
+      if (UsrIdEl) {
+        let usrId = UsrIdEl.getAttribute('href');
+        usrId = usrId.replace(/^\//g, '');
+        if (!replyEl.querySelector(`[data-xusrid="${usrId}"]`)) {
+          TlList.dataset.xusrid = usrId;// Set custom data attribute with user ID
+          return usrId;
         } else {
           debug.log(DEBUG_LEVEL.ERROR, 'UsrIdEl is Null');
         }
       }
-    });
+    }
   },
 
-  addar: function (usrId) {
+          
+    addar: function (usrId) {
     if (usrId in replyObjects.idCntList) {
       replyObjects.idCntList[usrId]++;
     } else {
