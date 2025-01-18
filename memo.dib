@@ -1,0 +1,8 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"javascript","items":[{"aliases":[],"languageName":"javascript","name":"javascript"}]}}
+
+#!javascript
+
+const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
+const arabicRegex = /[\u0600-\u06FF]+/;
