@@ -1,11 +1,18 @@
 const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 
-const zoexDefaults = {
+const zoexSettings = {
   enabled: true, // default enabled
-  replyTimes: 3, // default: 3
-  blacklist: '/^[\u0900-\u097f\u2600-\u26FF]+$/'.replace(regStrip, "")
-  [\u0600-\u061d-\u0900 - \u097f\u2600 -\u26FF]
-};
+  emojiP: 3,
+  imgP: 1,
+  videoP: 1,
+  linkP: 1,
+  blueP: 1,
+  replyP: 3,
+  mixTrendWordP: 3,
+  langP: 3,
+  replyTimes: 3,
+  blacklist: '/[\u0600-\u06FF]+[\u0900-\u097f\u2600-\u26FF]+/', // default blacklist
+}
 
 
 

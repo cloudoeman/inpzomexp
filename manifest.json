@@ -1,12 +1,20 @@
 {
   "name": "impression zombie explosion",
   "description": "インプレゾンビ爆破",
-  "version": "0.23",
+  "version": "0.23.0",
   "manifest_version": 3,
+  "options_ui": {
+    "page": "options.html",
+    "open_in_tab": true
+  },
   "content_scripts": [
     {
-      "matches": ["*://x.com/*"],
-      "js": ["content_script.js"]
+      "matches": [
+        "*://x.com/*"
+      ],
+      "js": [
+        "content_script.js"
+      ]
     }
   ],
   "icons": {
