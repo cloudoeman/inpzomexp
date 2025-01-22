@@ -11,7 +11,7 @@ const zoexDefault = {
   mixTrendWordP: 3,
   langP: 3,
   replyTimes: 3,
-  blacklist: '/[\u0600-\u06FF]+ | [\u0900-\u097f\u2600-\u26FF]+/', // default blacklist
+  blacklist: "[\u0600-\u06FF]+ | [\u0900-\u097f\u2600-\u26FF]+", // default blacklist
 }
 
 const validate = function () {
@@ -24,6 +24,42 @@ const validate = function () {
   });
 }
 
+const saveOptions = function() {
+  const enabled = document.getElementById("enabled").checked;
+  const emojiP = document.getElementById("emojiP").value;
+  const imgP = document.getElementById("imgP").value;
+  const videoP = document.getElementById("videoP").value;
+  const linkP = document.getElementById("linkP").value;
+  const blueP = document.getElementById("blueP").value;
+  const replyP = document.getElementById("replyP").value;
+  const mixTrendWordP = document.getElementById("mixTrendWordP").value;
+  const langP = document.getElementById("langP").value;
+  const replyTimes = document.getElementById("replyTimes").value;
+  const blacklist = document.getElementById("blacklist").value;
+
+  chrome.storage.sync.set(
+    {
+    enabled: true, // default enabled
+    emojiP: emojiP,
+    imgP: imgP,
+    videoP: videoP,
+    linkP: linkP,
+    blueP: blueP,
+    replyP: replyP,
+    mixTrendWordP: mixTrendWordP,
+    langP: langP,
+    replyTimes: replyTimes,
+    blacklist: blacklist, // default blacklist
+    },
+    function() {
+      const status = document.getElementById("status");
+      status.textContent = "Options saved";
+      setTimeout(function () {
+        status.textContent = "";
+      }, 1000);
+    }
+  );
+}
 const restoreOptions = function () {
   chrome.storage.sync.get(zoexDefault, function (storage) {
     document.getElementById("enabled").checked = storage.enabled;
@@ -55,6 +91,6 @@ const restoreDefaults = function () {
 
 document.addEventListener("DOMContentLoaded", function () {
   restoreOptions();
-  //document.getElementById("save").addEventListener("click", save_options);
+  document.getElementById("save").addEventListener("click", saveOptions);
   document.getElementById("restore").addEventListener("click", restoreDefaults);
 });
