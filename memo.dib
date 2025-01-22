@@ -1,8 +1,38 @@
 #!meta
 
-{"kernelInfo":{"defaultKernelName":"javascript","items":[{"aliases":[],"languageName":"javascript","name":"javascript"}]}}
+{"kernelInfo":{"defaultKernelName":"csharp","items":[{"aliases":[],"name":"csharp"},{"aliases":["js"],"languageName":"javascript","name":"javascript"}]}}
 
 #!javascript
 
 const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 const arabicRegex = /[\u0600-\u06FF]+/;
+const jpRegex = /[\u3040-\u30FF]+/;
+
+const testArabic = function(str) {
+  console.log(arabicRegex.test(str));
+};
+
+const testJapanese = function(str) {
+  console.log(jpRegex.test(str));
+};
+const str = "هذا نص عربي";
+const strjp = "これは日本語のテキストですaiueo";
+testJapanese(strjp);
+
+#!javascript
+
+const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
+const str = "www.instagram.com";
+const match = str.replace(regStrip, "");
+
+if (match.startsWith("/")) {
+  var parts = match.split("/");
+  console.log(parts);
+  var flags = parts.pop();
+  console.log(flags);
+  var regex = parts.slice(1).join("/");
+  var regexp = new RegExp(regex, flags);
+  console.log(regexp);
+} else {
+  console.log("no match");
+}
