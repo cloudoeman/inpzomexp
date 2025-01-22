@@ -3,6 +3,9 @@
   "description": "インプレゾンビ爆破",
   "version": "0.23.0",
   "manifest_version": 3,
+  "permissions": [
+    "storage"
+  ],
   "options_ui": {
     "page": "Settings.html",
     "open_in_tab": true
