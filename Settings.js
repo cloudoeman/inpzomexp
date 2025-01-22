@@ -11,7 +11,9 @@ const zoexDefault = {
   mixTrendWordP: 3,
   langP: 3,
   replyTimes: 3,
-  blacklist: "[\u0600-\u06FF]+ | [\u0900-\u097f\u2600-\u26FF]+", // default blacklist
+  blacklist: `[\\u0600-\\u06FF]+
+    [\\u0900-\\u097f\\u2600-\\u26FF]+
+  `.replace(regStrip, ""), // default blacklist
 }
 
 const validate = function () {
@@ -21,10 +23,37 @@ const validate = function () {
 
   blacklist.value.split("\n").forEach((match) => {
     match = match.replace(regStrip, "");
+
+    if (match.startsWith("[")) {
+      try {
+        const parts = match.split("[");
+
+        if (!match.endsWith("+"))
+          throw "invalid regex";
+        /*
+        var flags = parts.pop();
+        var regex = parts.slice(1).join("/");
+
+        var regexp = new RegExp(regex, flags);
+        */
+      } catch (err) {
+        status.textContent =
+          "Error: Invalid blacklist regex: \"" + match + "\". Unable to save. Try wrapping it in foward slashes.";
+        valid = false;
+        return;
+      }
+    }
   });
+  return valid;
 }
 
 const saveOptions = function() {
+  /*
+  if(validate() === false) {
+    return;
+  }
+  */
+
   const enabled = document.getElementById("enabled").checked;
   const emojiP = document.getElementById("emojiP").value;
   const imgP = document.getElementById("imgP").value;
@@ -49,17 +78,19 @@ const saveOptions = function() {
     mixTrendWordP: mixTrendWordP,
     langP: langP,
     replyTimes: replyTimes,
-    blacklist: blacklist, // default blacklist
+    blacklist: blacklist.replace(regStrip, ""), // default blacklist
     },
     function() {
       const status = document.getElementById("status");
       status.textContent = "Options saved";
+      console.log(blacklist);
       setTimeout(function () {
         status.textContent = "";
       }, 1000);
     }
   );
 }
+
 const restoreOptions = function () {
   chrome.storage.sync.get(zoexDefault, function (storage) {
     document.getElementById("enabled").checked = storage.enabled;
