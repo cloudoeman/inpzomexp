@@ -47,7 +47,7 @@ const validate = function () {
   return valid;
 }
 
-const saveOptions = function() {
+const saveOptions = function () {
   /*
   if(validate() === false) {
     return;
@@ -68,19 +68,19 @@ const saveOptions = function() {
 
   chrome.storage.sync.set(
     {
-    enabled: true, // default enabled
-    emojiP: emojiP,
-    imgP: imgP,
-    videoP: videoP,
-    linkP: linkP,
-    blueP: blueP,
-    replyP: replyP,
-    mixTrendWordP: mixTrendWordP,
-    langP: langP,
-    replyTimes: replyTimes,
-    blacklist: blacklist.replace(regStrip, ""), // default blacklist
+      enabled: true, // default enabled
+      emojiP: emojiP,
+      imgP: imgP,
+      videoP: videoP,
+      linkP: linkP,
+      blueP: blueP,
+      replyP: replyP,
+      mixTrendWordP: mixTrendWordP,
+      langP: langP,
+      replyTimes: replyTimes,
+      blacklist: blacklist.replace(regStrip, ""), // default blacklist
     },
-    function() {
+    function () {
       const status = document.getElementById("status");
       status.textContent = "Options saved";
       console.log(blacklist);
