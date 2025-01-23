@@ -111,17 +111,16 @@ const observeObject = {
 const systemFunc = {
   TIMELINEURL: /^https:\/\/x.com\/.+\/status\/[0-9]+/,
   TRENDURL: /^https:\/\/x.com\/search\?q=.+&src=trend_click&vertical=trends/,
-  TRENDWORDS: /^https:\/\/x.com\/explore.*/,
   WAITTIME: 0,
   getElmByDataTestIdTIME: 2000,
-  document1: document,
+  document: document,
   tweetsParent: undefined,
   tweetsList: undefined,
   preUrl: undefined,
 
 
   getElementByDataTestId: function () {
-    const timeLineChild = this.document1.querySelector('[data-testid="cellInnerDiv"]');
+    const timeLineChild = this.document.querySelector('[data-testid="cellInnerDiv"]');
     if (timeLineChild) {
       debug.log(DEBUG_LEVEL.DEBUG, 'get timeLineChild');
       this.tweetsParent = timeLineChild.parentNode;
@@ -155,7 +154,6 @@ const systemFunc = {
       replyObjects.idCntList = {};
     }
     systemFunc.dataSet(this.tweetsList);
-    //debug.log(DEBUG_LEVEL.DEBUG, `idCntList:${replyObjects.idCntList}`);
     console.log(replyObjects.idCntList);
     console.log(replyObjects.tweetTextList);
     deleteObjects.delId();
@@ -203,111 +201,14 @@ const systemFunc = {
     } else {
       replyObjects.idCntList[usrId] = 1;
     }
-  },
-
-  tweetTexts: function (tlList, usrId) {
-    if (tlList.querySelector('[data-testid="tweetText"]')) {
-      const tweetText = tlList.querySelector('[data-testid="tweetText"]').innerText;
-      const emojiStr = replyObjects.emojiCheck(tlList);
-      let replyText = tweetText
-      if (emojiStr) {
-        replyText = tweetText + emojiStr;
-      }
-      if (!replyObjects.tweetTextList[usrId]) {
-        replyObjects.tweetTextList[usrId] = [replyText];
-      } else if (!replyObjects.tweetTextList[usrId].includes(replyText)) {
-        replyObjects.tweetTextList[usrId].push(replyText);
-      }
-    }
   }
 };
 
 
 // リプライ用オブジェクト
 const replyObjects = {
-  EMOJI: /^https:\/\/abs-0.twimg.com\/emoji.*/, //https://abs-0.twimg.com/emoji/v2/svg/1f302.svg
-  tweetTextList: {},
   idCntList: {}, //X_id_cnt
-
-  emojiCheck: function (replyEl) {
-    const emojis = replyEl.querySelectorAll('img');
-    const emojiarry = [];
-    if (emojis) {
-      emojis.forEach(emoji => {
-        if (this.EMOJI.test(emoji.src)) {
-          emojiarry.push(emoji.alt);
-        }
-      });
-      if (emojiarry.length > 0) {
-        return emojiarry.join('');
-      }
-    }
-  },
-
-  imgCheck: function (replyEl) {
-    const imgs = replyEl.querySelectorAll('img');
-    if (imgs) {
-      imgs.forEach(img => {
-        if (img.alt === '画像') {
-          debug.log(DEBUG_LEVEL.INFO, `img:${img.src}`); //img.src
-        }
-      });
-    }
-  },
-
-  videoCheck: function (replyEl) {
-    const videos = replyEl.querySelectorAll('img');
-    debug.log(DEBUG_LEVEL.INFO, `videos:${videos}`);
-    if (videos) {
-      videos.forEach(video => {
-        if (videos.alt === '埋め込み動画') {
-          debug.log(DEBUG_LEVEL.INFO, `video:${videos.src}`); //videos.src
-        }
-      });
-    }
-  },
-
-  linkCheck: function (replyEl) {
-    const links = replyEl.querySelectorAll('a');
-    if (links.target === '_blank') {
-      links.forEach(link => {
-        if (link.href) {
-          debug.log(DEBUG_LEVEL.INFO, `link:${link.href}`);
-        }
-      });
-    }
-  },
-
-  blueCheck: function (replyEl, usrId) {
-    const blues = replyEl.querySelectorAll('svg');
-    if (blues) {
-      blues.forEach(blue => {
-        if (blue.ariaLabel === '認証済みアカウント') {
-          debug.log(DEBUG_LEVEL.INFO, `blue:${usrId}`); //usrId
-        }
-      });
-    }
-  }
 };
-
-
-// トレンド用オブジェクト
-const trendObjects = {
-  trendWordsClass: "css-146c3p1 r-bcqeeo r-1ttztb7 r-qvutc0 r-37j5jr r-a023e6 r-rjixqe r-b88u0q r-1bymd8e",
-  trendWords: [],
-
-  getText: function () {
-    //live html collection
-    const trendWordNodes = systemFunc.tweetsParent.getElementsByClassName(this.trendWordsClass);
-    const xWords = [...trendWordNodes].map(node => node.innerText);
-    xWords.forEach(xWord => {
-      if (!(xWord in this.trendWords)) {
-        this.trendWords.push(xWord);
-      }
-    });
-  }
-};
-
 
 // リプライ削除用オブジェクト
 const deleteObjects = {
