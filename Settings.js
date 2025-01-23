@@ -1,4 +1,4 @@
-const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
+const regStrip = /^[\r\t\f\v\n ]+|[\r\t\f\v\n ]+$/gm;
 
 const zoexDefault = {
   enabled: true, // default enabled
@@ -15,12 +15,24 @@ const zoexDefault = {
     [\\u0900-\\u097f\\u2600-\\u26FF]+
   `.replace(regStrip, ""), // default blacklist
 }
-
+//ex /[\\u0600-\\u06FF]+\n[\\u0900-\\u097f\\u2600-\\u26FF]+/
+/*
 const validate = function () {
   let valid = true;
   const status = document.getElementById("status");
-  const blacklist = document.getElementById("blacklist");
+  let blacklist = document.getElementById("blacklist");
 
+  blacklist = blacklist.replace(regStrip, "");
+  if (blacklist.startsWith("/")) {
+    try {
+      const parts = blacklist.split("/");
+
+      if (parts.length > 3)
+        throw "invalid regex";
+
+      const flags
+    }
+  }
   blacklist.value.split("\n").forEach((match) => {
     match = match.replace(regStrip, "");
 
@@ -33,9 +45,9 @@ const validate = function () {
         /*
         var flags = parts.pop();
         var regex = parts.slice(1).join("/");
-
+ 
         var regexp = new RegExp(regex, flags);
-        */
+        
       } catch (err) {
         status.textContent =
           "Error: Invalid blacklist regex: \"" + match + "\". Unable to save. Try wrapping it in foward slashes.";
@@ -46,8 +58,9 @@ const validate = function () {
   });
   return valid;
 }
+*/
 
-const saveOptions = function() {
+const saveOptions = function () {
   /*
   if(validate() === false) {
     return;
@@ -68,19 +81,19 @@ const saveOptions = function() {
 
   chrome.storage.sync.set(
     {
-    enabled: true, // default enabled
-    emojiP: emojiP,
-    imgP: imgP,
-    videoP: videoP,
-    linkP: linkP,
-    blueP: blueP,
-    replyP: replyP,
-    mixTrendWordP: mixTrendWordP,
-    langP: langP,
-    replyTimes: replyTimes,
-    blacklist: blacklist.replace(regStrip, ""), // default blacklist
+      enabled: true, // default enabled
+      emojiP: emojiP,
+      imgP: imgP,
+      videoP: videoP,
+      linkP: linkP,
+      blueP: blueP,
+      replyP: replyP,
+      mixTrendWordP: mixTrendWordP,
+      langP: langP,
+      replyTimes: replyTimes,
+      blacklist: blacklist.replace(regStrip, ""), // default blacklist
     },
-    function() {
+    function () {
       const status = document.getElementById("status");
       status.textContent = "Options saved";
       console.log(blacklist);
