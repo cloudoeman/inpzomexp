@@ -1,14 +1,16 @@
 const zoexDefalut = {
-  settings: {
+  zoexSettings: {
     enabled: true, // default enabled
-    emoji: 3,
-    img: 1,
-    video: 1,
-    link: 1,
-    blue: 1,
-    replyTime: 3,
-    mixTrendWord: 3,
-    blacklist: '/^[\u0900-\u097f\u2600-\u26FF]+$/', // default blacklist
+    emojiP: 3,
+    imgP: 1,
+    videoP: 1,
+    linkP: 1,
+    blueP: 1,
+    replyP: 3,
+    mixTrendWordP: 3,
+    langP: 3,
+    replyTimes: 3,
+    blacklist: '/[\u0600-\u06FF]+ | [\u0900-\u097f\u2600-\u26FF]+/', // default blacklist
   }
 }
 
