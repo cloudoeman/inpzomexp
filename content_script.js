@@ -1,13 +1,17 @@
-const zoexDefalut = {
+
+
+const zombie_explosion = {
   settings: {
     enabled: true, // default enabled
-    emoji: 3,
-    img: 1,
-    video: 1,
-    link: 1,
-    blue: 1,
-    replyTime: 3,
-    mixTrendWord: 3,
+    emojiP: 3,
+    imgP: 1,
+    videoP: 1,
+    linkP: 1,
+    blueP: 1,
+    replyP: 3,
+    mixTrendWordP: 3,
+    langP: 3,
+    replyTimes: 3,
     blacklist: '/^[\u0900-\u097f\u2600-\u26FF]+$/', // default blacklist
   }
 }
@@ -67,17 +71,6 @@ const observeObject = {
         systemFunc.preUrl = isUrl;
         this.category = 'trend';
         this.observeStart(isUrl);
-
-        // get trendWords
-      } else if (systemFunc.TRENDWORDS.test(isUrl)) {
-        if (systemFunc.preUrl !== isUrl && systemFunc.preUrl === undefined) {
-          trendObjects.trendWords.length = 0;
-        }
-        systemFunc.preUrl = isUrl;
-        await systemFunc.loadWait(systemFunc.getElmByDataTestIdTIME);
-        systemFunc.getElementByDataTestId();
-        trendObjects.getText(mutations);
-        debug.log(DEBUG_LEVEL.INFO, `trendWords:${trendObjects.trendWords}`);
       }
     }
   },
@@ -166,10 +159,6 @@ const systemFunc = {
       }
       const usrId = this.setId(TlList);
       if (usrId) {
-        this.tweetTexts(TlList, usrId);
-        replyObjects.imgCheck(TlList);
-        replyObjects.linkCheck(TlList);
-        replyObjects.blueCheck(TlList, usrId);
         this.addar(usrId);
       }
     });
@@ -238,9 +227,28 @@ const deleteObjects = {
   }
 };
 
+optionSettings = function () {
+  chrome.storage.sync.get(Object.keys(zombie_explosion.settings), function (items) {
+    zombie_explosion.settings.enabled = items.enabled;
+    zombie_explosion.settings.emojiP = items.emojiP;
+    zombie_explosion.settings.imgP = items.imgP;
+    zombie_explosion.settings.videoP = items.videoP;
+    zombie_explosion.settings.linkP = items.linkP;
+    zombie_explosion.settings.blueP = items.blueP;
+    zombie_explosion.settings.replyP = items.replyP;
+    zombie_explosion.settings.mixTrendWordP = items.mixTrendWordP;
+    zombie_explosion.settings.langP = items.langP;
+    zombie_explosion.settings.replyTimes = items.replyTimes;
+    zombie_explosion.settings.blacklist = items.blacklist;
+  });
+}
+
+
+
 
 window.addEventListener("load", async (event) => {
   // 現在のURLを取得
+  optionSettings();
   const isUrl = location.href;
   debug.log(DEBUG_LEVEL.INFO, `current URL:${isUrl}`);
   await systemFunc.loadWait(systemFunc.getElmByDataTestIdTIME);
