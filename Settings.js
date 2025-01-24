@@ -20,39 +20,28 @@ const validate = function () {
   let valid = true;
   const status = document.getElementById("status");
   const blacklist = document.getElementById("blacklist");
-
-  blacklist.value.split("\n").forEach((match) => {
-    match = match.replace(regStrip, "");
-
-    if (match.startsWith("[")) {
-      try {
-        const parts = match.split("[");
-
-        if (!match.endsWith("+"))
-          throw "invalid regex";
-        /*
-        var flags = parts.pop();
-        var regex = parts.slice(1).join("/");
-
-        var regexp = new RegExp(regex, flags);
-        */
-      } catch (err) {
-        status.textContent =
-          "Error: Invalid blacklist regex: \"" + match + "\". Unable to save. Try wrapping it in foward slashes.";
-        valid = false;
-        return;
-      }
+  if (blacklist.startsWith("/")) {
+    try {
+      blacklist.value.split("\n").forEach(match => {
+        match = match.replace(regStrip, "");
+        const regex = regex + match;
+      })
+      if (!match.endsWith("/"))
+        throw "invalid regex";
+      regexp = new RegExp(regex);
+    } catch (err) {
+      status.textContent = "Error: Invalid blacklist regex: \"" + regex + "\". Unable to save. Try wrapping it in foward slashes.";
+      valid = false;
+      return;
     }
-  });
+  }
   return valid;
 }
 
 const saveOptions = function () {
-  /*
-  if(validate() === false) {
+  if (validate() === false) {
     return;
   }
-  */
 
   const enabled = document.getElementById("enabled").checked;
   const emojiP = document.getElementById("emojiP").value;
@@ -65,6 +54,7 @@ const saveOptions = function () {
   const langP = document.getElementById("langP").value;
   const replyTimes = document.getElementById("replyTimes").value;
   const blacklist = document.getElementById("blacklist").value;
+  console.log(blacklist);
 
   chrome.storage.sync.set(
     {
