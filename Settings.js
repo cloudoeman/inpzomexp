@@ -1,4 +1,4 @@
-const regStrip = /^[\r\t\f\v\n ]+|[\r\t\f\v\n ]+$/gm;
+const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 
 const zoexDefault = {
   enabled: true, // default enabled
@@ -15,8 +15,7 @@ const zoexDefault = {
     [\\u0900-\\u097f\\u2600-\\u26FF]+
   `.replace(regStrip, ""), // default blacklist
 }
-//ex /[\\u0600-\\u06FF]+\n[\\u0900-\\u097f\\u2600-\\u26FF]+/
-/*
+
 const validate = function () {
   let valid = true;
   const status = document.getElementById("status");
@@ -38,7 +37,6 @@ const validate = function () {
   }
   return valid;
 }
-*/
 
 const saveOptions = function () {
   if (validate() === false) {
