@@ -76,9 +76,7 @@ button {
 
 input[type="text"] {
   width: 30px;
-  /* 幅を小さくする */
   text-align: center;
-  /* 右に寄せる */
 }
 
 .row {
