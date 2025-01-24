@@ -1,0 +1,7 @@
+#!meta
+
+{"kernelInfo":{"defaultKernelName":"javascript","items":[{"aliases":[],"languageName":"javascript","name":"javascript"}]}}
+
+#!javascript
+
+console.log("hi");
