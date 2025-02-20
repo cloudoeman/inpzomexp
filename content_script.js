@@ -175,6 +175,7 @@ const systemFunc = {
       }
       const usrId = this.setId(TlList);
       if (usrId) {
+        this.idPointList[lisNum] = new idPoint(usrId);
         this.tweetTexts(TlList, usrId);
         replyObjects.imgCheck(TlList);
         replyObjects.linkCheck(TlList);
@@ -306,12 +307,12 @@ const replyObjects = {
     }
   },
 
-  blueCheck: function (replyEl, usrId) {
+  blueCheck: function (replyEl) {
     const blues = replyEl.querySelectorAll('svg');
     if (blues) {
       blues.forEach(blue => {
         if (blue.ariaLabel === '認証済みアカウント') {
-          debug.log(DEBUG_LEVEL.INFO, `blue:${usrId}`); //usrId
+          //debug.log(DEBUG_LEVEL.INFO, `blue:${usrId}`); //usrId
           return true;
         }
       });
