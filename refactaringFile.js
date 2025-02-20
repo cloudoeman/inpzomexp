@@ -142,14 +142,32 @@ const systemFunc = {
     });
   },
 
+  bebugTest: function () {
+    systemFunc.idPointList.forEach((idPoint, num) => {
+      console.group("idPointList details");
+      debug.log(DEBUG_LEVEL.INFO, `num:${num}`);
+      debug.log(DEBUG_LEVEL.INFO, `id:${idPoint.id}`);
+      debug.log(DEBUG_LEVEL.INFO, `emoji:${idPoint.emoji}`);
+      debug.log(DEBUG_LEVEL.INFO, `img:${idPoint.img}`);
+      debug.log(DEBUG_LEVEL.INFO, `video:${idPoint.video}`);
+      debug.log(DEBUG_LEVEL.INFO, `link:${idPoint.link}`);
+      debug.log(DEBUG_LEVEL.INFO, `blue:${idPoint.blue}`);
+      debug.log(DEBUG_LEVEL.INFO, `reply:${idPoint.reply}`);
+      debug.log(DEBUG_LEVEL.INFO, `trendWord:${idPoint.trendWord}`);
+      debug.log(DEBUG_LEVEL.INFO, `lang:${idPoint.lang}`);
+      debug.log(DEBUG_LEVEL.INFO, `totalPoint:${idPoint.totalPoint}`);
+      console.groupEnd();
+    });
+  },
+
   restart: function () {
     //debug.log(DEBUG_LEVEL.INFO, 'rescanning', 'blue');
-    console.info('%crescanning', 'font-weight: bold;');
+    console.info('%cRescanning', 'font-weight: bold;');
 
     if (deleteObjects.delIdList) {
       deleteObjects.delIdList.forEach(idName => {
-        console.log(deleteObjects.delIdList);
-        console.log(`deleted:${idName}`);
+        console.log(deleteObjects.delIdList); //[object Object]になる為
+        debug.log(DEBUG_LEVEL.INFO, `deleted:${idName}`);
         deleteObjects.delTweet(idName);
       });
     }
@@ -158,10 +176,11 @@ const systemFunc = {
       replyObjects.idCntList = {};
     }
     systemFunc.dataSet(this.tweetsList);
-    console.log(replyObjects.idCntList);
+    console.log(replyObjects.idCntList); //[object Object]になる為
     console.log(replyObjects.tweetTextList);
     deleteObjects.delId();
     debug.log(DEBUG_LEVEL.INFO, `finished`);
+    systemFunc.bebugTest();
   },
 
   dataSet: function (TlLists) {
@@ -170,12 +189,16 @@ const systemFunc = {
         return;
       }
       const usrId = this.setId(TlList);
-      if (usrId in replyObjects.idCntList) {
+      if (!usrId) {
+        return;
+      } else if (!(usrId in replyObjects.idCntList)) {
         this.addar(usrId);
         this.idPointList[lisNum] = new idPoint(usrId);
+        debug.log(DEBUG_LEVEL.INFO, `created class:${usrId}`);
         checkObjects.tweetEval(TlList, usrId, lisNum);
       } else {
         this.addar(usrId);
+        debug.log(DEBUG_LEVEL.INFO, `recheck class:${usrId}`);
         checkObjects.tweetEval(TlList, usrId, lisNum);
       }
     });
@@ -269,23 +292,23 @@ const checkObjects = {
   EMOJI: /^https:\/\/abs-0.twimg.com\/emoji.*/, //https://abs-0.twimg.com/emoji/v2/svg/1f302.svg
 
   tweetTexts: function (tlList, usrId) {
-    let only = false;
-    const emojiStr = replyObjects.emojiCheck(tlList);
+    let textCate = 0;
+    const emojiStr = checkObjects.emojiCheck(tlList);
     let replyText = emojiStr ? emojiStr : null;
     if (emojiStr) {
-      only = true;
+      textCate = 1;
     }
     if (tlList.querySelector('[data-testid="tweetText"]')) {
       const tweetText = tlList.querySelector('[data-testid="tweetText"]').innerText;
       replyText = replyText ? replyText + tweetText : tweetText;
-      only = false;
+      textCate = 2;
     }
     if (!replyObjects.tweetTextList[usrId]) {
       replyObjects.tweetTextList[usrId] = [replyText];
     } else if (!replyObjects.tweetTextList[usrId].includes(replyText)) {
       replyObjects.tweetTextList[usrId].push(replyText);
     }
-    return only;
+    return textCate;
   },
 
   emojiCheck: function (replyEl) {
@@ -304,108 +327,115 @@ const checkObjects = {
   },
 
   imgCheck: function (replyEl) {
+    let boo = false;
     const imgs = replyEl.querySelectorAll('img');
     if (imgs) {
       imgs.forEach(img => {
         if (img.alt === '画像') {
           debug.log(DEBUG_LEVEL.INFO, `img:${img.src}`); //img.src
-          return true;
+          boo = true;
         }
       });
     }
-    return false;
+    return boo;
   },
 
   videoCheck: function (replyEl) {
+    let boo = false;
     const videos = replyEl.querySelectorAll('img');
-    debug.log(DEBUG_LEVEL.INFO, `videos:${videos}`);
+    debug.log(DEBUG_LEVEL.DEBUG, `videos:${videos}`);
     if (videos) {
       videos.forEach(video => {
         if (videos.alt === '埋め込み動画') {
           debug.log(DEBUG_LEVEL.INFO, `video:${videos.src}`); //videos.src
-          return true;
+          boo = true;
         }
       });
     }
-    return false;
+    return boo;
   },
 
   linkCheck: function (replyEl) {
+    let boo = false;
     const links = replyEl.querySelectorAll('a');
     if (links.target === '_blank') {
       links.forEach(link => {
         if (link.href) {
           debug.log(DEBUG_LEVEL.INFO, `link:${link.href}`);
-          return true;
+          boo = true;
         }
       });
     }
-    return false;
+    return boo;
   },
 
-  blueCheck: function (replyEl, usrId) {
+  blueCheck: function (replyEl) {
+    let boo = 0;
     const blues = replyEl.querySelectorAll('svg');
     if (blues) {
       blues.forEach(blue => {
+        console.log(`blue:${blue.ariaLabel}`); //blue.ariaLabel
         if (blue.ariaLabel === '認証済みアカウント') {
-          debug.log(DEBUG_LEVEL.INFO, `blue:${usrId}`); //usrId
-          return true;
+          //debug.log(DEBUG_LEVEL.INFO, `blue:${usrId}`); //usrId
+          boo = 1;
         }
       });
     }
-    return false;
+    debug.log(DEBUG_LEVEL.INFO, `bluebool:${boo}`);
+    return boo;
   },
 
   tweetEval: function (replyEl, usrId, num) {
-    const emoji = checkObjects.tweetTexts(replyEl, usrId);
+    const textCate = checkObjects.tweetTexts(replyEl, usrId);
     const img = checkObjects.imgCheck(replyEl);
     const video = checkObjects.videoCheck(replyEl);
     const link = checkObjects.linkCheck(replyEl);
     const blue = checkObjects.blueCheck(replyEl);
-    const replyT = replyObjects.idCntList[usrId] > zombie_explosion.settings.replyTimes ? true : false;
-    const evalPoint = emoji + img + video + link;
+    debug.log(DEBUG_LEVEL.INFO, `bluecheck(${usrId}:${blue})`);
+    const replyT = replyObjects.idCntList[usrId] > zombie_explosion.settings.replyTimes ? 1 : 0;
+    const evalPoint = img + video + link;
 
-    if (evalPoint === 1) {
+    if (evalPoint === 1 && textCate === 0) {
       switch (true) {
-        case emoji:
-          idPointList[num].emoji = true;
-          break;
         case img:
-          idPointList[num].img = true;
+          systemFunc.idPointList[num].img = 1;
           break;
         case video:
-          idPointList[num].video = true;
+          systemFunc.idPointList[num].video = 1;
           break;
         case link:
-          idPointList[num].link = true;
+          systemFunc.idPointList[num].link = 1;
           break;
         default:
           debug.log(DEBUG_LEVEL.ERROR, `evalPoint:${evalPoint}`);
       }
+    } else if (textCate === 1) {
+      systemFunc.idPointList[num].emoji = 1;
     } else {
-      debug.log(DEBUG_LEVEL.INFO, `evalPoint:${evalPoint}`);
+      debug.log(DEBUG_LEVEL.INFO, `\"392\"evalPoint:${evalPoint}`);
     }
-    idPointList[num].blue = blue;
-    idPointList[num].reply = replyT;
-    idPointList[num].totalPoint();
-
+    systemFunc.idPointList[num].blue = blue;
+    systemFunc.idPointList[num].reply = replyT;
+    systemFunc.idPointList[num].ratingCalculation();
   }
 };
 
 
 const optionSettings = function () {
   chrome.storage.sync.get(Object.keys(zombie_explosion.settings), function (items) {
-    zombie_explosion.settings.enabled = items.enabled;
-    zombie_explosion.settings.emojiP = items.emojiP;
-    zombie_explosion.settings.imgP = items.imgP;
-    zombie_explosion.settings.videoP = items.videoP;
-    zombie_explosion.settings.linkP = items.linkP;
-    zombie_explosion.settings.blueP = items.blueP;
-    zombie_explosion.settings.replyP = items.replyP;
-    zombie_explosion.settings.mixTrendWordP = items.mixTrendWordP;
-    zombie_explosion.settings.langP = items.langP;
-    zombie_explosion.settings.replyTimes = items.replyTimes;
-    zombie_explosion.settings.blacklist = items.blacklist;
+    if (items.enabled !== undefined) {
+      zombie_explosion.settings.enabled = Number(items.enabled);
+      zombie_explosion.settings.emojiP = Number(items.emojiP);
+      zombie_explosion.settings.imgP = Number(items.imgP);
+      zombie_explosion.settings.videoP = Number(items.videoP);
+      zombie_explosion.settings.linkP = Number(items.linkP);
+      zombie_explosion.settings.blueP = Number(items.blueP);
+      zombie_explosion.settings.replyP = Number(items.replyP);
+      zombie_explosion.settings.mixTrendWordP = Number(items.mixTrendWordP);
+      zombie_explosion.settings.langP = Number(items.langP);
+      zombie_explosion.settings.replyTimes = Number(items.replyTimes);
+      zombie_explosion.settings.blacklist = items.blacklist;
+    }
   });
 };
 
@@ -413,17 +443,17 @@ const optionSettings = function () {
 class idPoint {
   constructor(idName) {
     this.id = idName;
-    this.emoji = false;
-    this.img = false;
-    this.video = false;
-    this.link = false;
-    this.blue = false;
-    this.reply = false;
-    this.trendWord = false;
-    this.lang = false;
+    this.emoji = 0;
+    this.img = 0;
+    this.video = 0;
+    this.link = 0;
+    this.blue = 0;
+    this.reply = 0;
+    this.trendWord = 0;
+    this.lang = 0;
     this.totalPoint = 0;
   }
-  totalPoint() {
+  ratingCalculation() {
     this.totalPoint = this.emoji * zombie_explosion.settings.emojiP +
       this.img * zombie_explosion.settings.imgP +
       this.video * zombie_explosion.settings.videoP +
