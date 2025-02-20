@@ -20,15 +20,18 @@ const validate = function () {
   let valid = true;
   const status = document.getElementById("status");
   const blacklist = document.getElementById("blacklist");
-  if (blacklist.startsWith("/")) {
+  if (blacklist.value.startsWith("/")) {
+    let regex;
     try {
       blacklist.value.split("\n").forEach(match => {
         match = match.replace(regStrip, "");
-        const regex = regex + match;
+        regex = regex + match;
       })
       if (!match.endsWith("/"))
         throw "invalid regex";
-      regexp = new RegExp(regex);
+      regex = regex.replace("/", "")
+      const regexp = new RegExp(regex);
+      console.log(regexp);
     } catch (err) {
       status.textContent = "Error: Invalid blacklist regex: \"" + regex + "\". Unable to save. Try wrapping it in foward slashes.";
       valid = false;
@@ -54,7 +57,6 @@ const saveOptions = function () {
   const langP = document.getElementById("langP").value;
   const replyTimes = document.getElementById("replyTimes").value;
   const blacklist = document.getElementById("blacklist").value;
-  console.log(blacklist);
 
   chrome.storage.sync.set(
     {
@@ -79,6 +81,7 @@ const saveOptions = function () {
       }, 1000);
     }
   );
+  chrome.storage.sync.get(null, ((data) => { console.log(data) }));
 }
 
 const restoreOptions = function () {

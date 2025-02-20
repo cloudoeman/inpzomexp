@@ -1,5 +1,3 @@
-
-
 const zombie_explosion = {
   settings: {
     enabled: true, // default enabled
@@ -15,7 +13,6 @@ const zombie_explosion = {
     blacklist: '/[\u0900-\u097f\u2600-\u26FF]+/', // default blacklist
   }
 };
-
 
 const DEBUG_LEVEL = {
   NONE: 0,
@@ -42,13 +39,13 @@ const debug = {
   }
 };
 
+
 // DOM監視オブジェクト
 const observeObject = {
   config: { childList: true },
   flag: true,
   isUrl: undefined,
   category: undefined,
-
 
   //上位observer
   mutationUrl: async function (mutations) {
@@ -110,7 +107,8 @@ const observeObject = {
     systemFunc.getElementByDataTestId();
     this.observer.observe(systemFunc.tweetsParent, this.config);
   }
-}
+};
+
 
 // システム用関数
 const systemFunc = {
@@ -124,7 +122,6 @@ const systemFunc = {
   tweetsList: undefined,
   preUrl: undefined,
   idPointList: [],
-
 
   getElementByDataTestId: function () {
     const timeLineChild = this.document.querySelector('[data-testid="cellInnerDiv"]');
@@ -169,17 +166,17 @@ const systemFunc = {
 
   dataSet: function (TlLists) {
     TlLists.forEach((TlList, lisNum) => {
-      //Excluding only tweet host.
-      if (lisNum <= 1 && observeObject.category === 'reply') {
+      if (lisNum <= 1 && observeObject.category === 'reply') {//Excluding only tweet host
         return;
       }
       const usrId = this.setId(TlList);
-      if (usrId) {
-        this.tweetTexts(TlList, usrId);
-        replyObjects.imgCheck(TlList);
-        replyObjects.linkCheck(TlList);
-        replyObjects.blueCheck(TlList, usrId);
+      if (usrId in replyObjects.idCntList) {
         this.addar(usrId);
+        this.idPointList[lisNum] = new idPoint(usrId);
+        checkObjects.tweetEval(TlList, usrId, lisNum);
+      } else {
+        this.addar(usrId);
+        checkObjects.tweetEval(TlList, usrId, lisNum);
       }
     });
   },
@@ -201,7 +198,6 @@ const systemFunc = {
     }
   },
 
-
   addar: function (usrId) {
     if (usrId in replyObjects.idCntList) {
       replyObjects.idCntList[usrId]++;
@@ -210,114 +206,15 @@ const systemFunc = {
     }
   },
 
-  tweetTexts: function (tlList, usrId) {
-    if (tlList.querySelector('[data-testid="tweetText"]')) {
-      const tweetText = tlList.querySelector('[data-testid="tweetText"]').innerText;
-      const emojiStr = replyObjects.emojiCheck(tlList);
-      let replyText = tweetText
-      if (emojiStr) {
-        replyText = tweetText + emojiStr;
-      }
-      if (!replyObjects.tweetTextList[usrId]) {
-        replyObjects.tweetTextList[usrId] = [replyText];
-      } else if (!replyObjects.tweetTextList[usrId].includes(replyText)) {
-        replyObjects.tweetTextList[usrId].push(replyText);
-      }
-    }
-  },
-
-  createIdPointObject: function () {
-    idCntList.forEach((idName, num) => {
-      this.idPointList[num] = new idPoint(idName);
-    });
-  },
-
-  tweetEval: function (text, num) {
-    const emoji = replyObjects.emojiCheck();
-    const img = replyObjects.imgCheck();
-    const video = replyObjects.videoCheck();
-    const link = replyObjects.linkCheck();
-    const blue = replyObjects.blueCheck();
-    if (text) {
-      idPointList[num].emoji = false;
-      idPointList[num].img = false;
-      idPointList[num].video = false;
-      idPointList[num].link = false;
-    } else {
-
-    }
-  }
 };
+
 
 // リプライ用オブジェクト
 const replyObjects = {
-  EMOJI: /^https:\/\/abs-0.twimg.com\/emoji.*/, //https://abs-0.twimg.com/emoji/v2/svg/1f302.svg
   tweetTextList: {},
-  idCntList: {}, //X_id_cnt
-
-  emojiCheck: function (replyEl) {
-    const emojis = replyEl.querySelectorAll('img');
-    const emojiarry = [];
-    if (emojis) {
-      emojis.forEach(emoji => {
-        if (this.EMOJI.test(emoji.src)) {
-          emojiarry.push(emoji.alt);
-        }
-      });
-      if (emojiarry.length > 0) {
-        return emojiarry.join('');
-      }
-    }
-  },
-
-  imgCheck: function (replyEl) {
-    const imgs = replyEl.querySelectorAll('img');
-    if (imgs) {
-      imgs.forEach(img => {
-        if (img.alt === '画像') {
-          debug.log(DEBUG_LEVEL.INFO, `img:${img.src}`); //img.src
-        }
-      });
-    }
-  },
-
-  videoCheck: function (replyEl) {
-    const videos = replyEl.querySelectorAll('img');
-    debug.log(DEBUG_LEVEL.INFO, `videos:${videos}`);
-    if (videos) {
-      videos.forEach(video => {
-        if (videos.alt === '埋め込み動画') {
-          debug.log(DEBUG_LEVEL.INFO, `video:${videos.src}`); //videos.src
-          return true;
-        }
-      });
-    }
-  },
-
-  linkCheck: function (replyEl) {
-    const links = replyEl.querySelectorAll('a');
-    if (links.target === '_blank') {
-      links.forEach(link => {
-        if (link.href) {
-          debug.log(DEBUG_LEVEL.INFO, `link:${link.href}`);
-          return true;
-        }
-      });
-    }
-  },
-
-  blueCheck: function (replyEl, usrId) {
-    const blues = replyEl.querySelectorAll('svg');
-    if (blues) {
-      blues.forEach(blue => {
-        if (blue.ariaLabel === '認証済みアカウント') {
-          debug.log(DEBUG_LEVEL.INFO, `blue:${usrId}`); //usrId
-          return true;
-        }
-      });
-    }
-  }
+  idCntList: {} //X_id_cnt
 };
+
 
 // トレンド用オブジェクト
 const trendObjects = {
@@ -335,6 +232,7 @@ const trendObjects = {
     });
   }
 };
+
 
 // リプライ削除用オブジェクト
 const deleteObjects = {
@@ -366,6 +264,135 @@ const deleteObjects = {
   }
 };
 
+
+const checkObjects = {
+  EMOJI: /^https:\/\/abs-0.twimg.com\/emoji.*/, //https://abs-0.twimg.com/emoji/v2/svg/1f302.svg
+
+  tweetTexts: function (tlList, usrId) {
+    let only = false;
+    const emojiStr = replyObjects.emojiCheck(tlList);
+    let replyText = emojiStr ? emojiStr : null;
+    if (emojiStr) {
+      only = true;
+    }
+    if (tlList.querySelector('[data-testid="tweetText"]')) {
+      const tweetText = tlList.querySelector('[data-testid="tweetText"]').innerText;
+      replyText = replyText ? replyText + tweetText : tweetText;
+      only = false;
+    }
+    if (!replyObjects.tweetTextList[usrId]) {
+      replyObjects.tweetTextList[usrId] = [replyText];
+    } else if (!replyObjects.tweetTextList[usrId].includes(replyText)) {
+      replyObjects.tweetTextList[usrId].push(replyText);
+    }
+    return only;
+  },
+
+  emojiCheck: function (replyEl) {
+    const emojis = replyEl.querySelectorAll('img');
+    const emojiarry = [];
+    if (emojis) {
+      emojis.forEach(emoji => {
+        if (this.EMOJI.test(emoji.src)) {
+          emojiarry.push(emoji.alt);
+        }
+      });
+      if (emojiarry.length > 0) {
+        return emojiarry.join('');
+      }
+    }
+  },
+
+  imgCheck: function (replyEl) {
+    const imgs = replyEl.querySelectorAll('img');
+    if (imgs) {
+      imgs.forEach(img => {
+        if (img.alt === '画像') {
+          debug.log(DEBUG_LEVEL.INFO, `img:${img.src}`); //img.src
+          return true;
+        }
+      });
+    }
+    return false;
+  },
+
+  videoCheck: function (replyEl) {
+    const videos = replyEl.querySelectorAll('img');
+    debug.log(DEBUG_LEVEL.INFO, `videos:${videos}`);
+    if (videos) {
+      videos.forEach(video => {
+        if (videos.alt === '埋め込み動画') {
+          debug.log(DEBUG_LEVEL.INFO, `video:${videos.src}`); //videos.src
+          return true;
+        }
+      });
+    }
+    return false;
+  },
+
+  linkCheck: function (replyEl) {
+    const links = replyEl.querySelectorAll('a');
+    if (links.target === '_blank') {
+      links.forEach(link => {
+        if (link.href) {
+          debug.log(DEBUG_LEVEL.INFO, `link:${link.href}`);
+          return true;
+        }
+      });
+    }
+    return false;
+  },
+
+  blueCheck: function (replyEl, usrId) {
+    const blues = replyEl.querySelectorAll('svg');
+    if (blues) {
+      blues.forEach(blue => {
+        if (blue.ariaLabel === '認証済みアカウント') {
+          debug.log(DEBUG_LEVEL.INFO, `blue:${usrId}`); //usrId
+          return true;
+        }
+      });
+    }
+    return false;
+  },
+
+  tweetEval: function (replyEl, usrId, num) {
+    const emoji = checkObjects.tweetTexts(replyEl, usrId);
+    const img = checkObjects.imgCheck(replyEl);
+    const video = checkObjects.videoCheck(replyEl);
+    const link = checkObjects.linkCheck(replyEl);
+    const blue = checkObjects.blueCheck(replyEl);
+    const replyT = replyObjects.idCntList[usrId] > zombie_explosion.settings.replyTimes ? true : false;
+    const evalPoint = emoji + img + video + link;
+
+    if (evalPoint === 1) {
+      switch (true) {
+        case emoji:
+          idPointList[num].emoji = true;
+          break;
+        case img:
+          idPointList[num].img = true;
+          break;
+        case video:
+          idPointList[num].video = true;
+          break;
+        case link:
+          idPointList[num].link = true;
+          break;
+        default:
+          debug.log(DEBUG_LEVEL.ERROR, `evalPoint:${evalPoint}`);
+      }
+    } else {
+      debug.log(DEBUG_LEVEL.INFO, `evalPoint:${evalPoint}`);
+    }
+    idPointList[num].blue = blue;
+    idPointList[num].reply = replyT;
+    idPointList[num].totalPoint();
+
+  }
+};
+
+
 const optionSettings = function () {
   chrome.storage.sync.get(Object.keys(zombie_explosion.settings), function (items) {
     zombie_explosion.settings.enabled = items.enabled;
@@ -381,6 +408,7 @@ const optionSettings = function () {
     zombie_explosion.settings.blacklist = items.blacklist;
   });
 };
+
 
 class idPoint {
   constructor(idName) {
@@ -406,7 +434,6 @@ class idPoint {
       this.lang * zombie_explosion.settings.langP;
   }
 }
-
 
 
 window.addEventListener("load", async (event) => {
