@@ -94,7 +94,7 @@ const observeObject = {
           systemFunc.restart();
           await systemFunc.loadWait(systemFunc.WAITTIME);
           this.flag = true;
-          debug.log(DEBUG_LEVEL.INFO, `${systemFunc.WAITTIME}ms later`);
+          //debug.log(DEBUG_LEVEL.INFO, `${systemFunc.WAITTIME}ms later`);
         }
       });
     }
@@ -180,7 +180,7 @@ const systemFunc = {
     console.log(replyObjects.tweetTextList);
     deleteObjects.delId();
     debug.log(DEBUG_LEVEL.INFO, `finished`);
-    systemFunc.bebugTest();
+    //systemFunc.bebugTest();
   },
 
   dataSet: function (TlLists) {
@@ -191,16 +191,16 @@ const systemFunc = {
       const usrId = this.setId(TlList);
       if (!usrId) {
         return;
-      } else if (!(usrId in replyObjects.idCntList)) {
+      } else if (!(usrId in replyObjects.tweetTextList)) {
         this.addar(usrId);
         this.idPointList[lisNum] = new idPoint(usrId);
-        debug.log(DEBUG_LEVEL.INFO, `created class:${usrId}`);
+        debug.log(DEBUG_LEVEL.INFO, `created class:${lisNum}:${usrId}`);
         checkObjects.tweetEval(TlList, usrId, lisNum);
       } else {
         this.addar(usrId);
         debug.log(DEBUG_LEVEL.INFO, `recheck class:${usrId}`);
         const num = checkObjects.targetNum(usrId);
-        console.log(num);
+        console.log(`list number${num}`);
         checkObjects.tweetEval(TlList, usrId, num);
       }
     });
@@ -387,16 +387,14 @@ const checkObjects = {
     return boo;
   },
 
-  tweetEval: async function (replyEl, usrId, num) {
+  tweetEval: function (replyEl, usrId, num) {
     const textCate = checkObjects.tweetTexts(replyEl, usrId);
     const img = checkObjects.imgCheck(replyEl);
     const video = checkObjects.videoCheck(replyEl);
     const link = checkObjects.linkCheck(replyEl);
     const blue = checkObjects.blueCheck(replyEl);
-    debug.log(DEBUG_LEVEL.INFO, `bluecheck(${usrId}:${blue})`);
     const replyT = replyObjects.idCntList[usrId] > zombie_explosion.settings.replyTimes ? 1 : 0;
     const evalPoint = img + video + link;
-    await systemFunc.loadWait("1000")
 
     if (evalPoint === 1 && textCate === 0) {
       switch (true) {
