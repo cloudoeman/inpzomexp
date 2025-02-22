@@ -199,7 +199,9 @@ const systemFunc = {
       } else {
         this.addar(usrId);
         debug.log(DEBUG_LEVEL.INFO, `recheck class:${usrId}`);
-        checkObjects.tweetEval(TlList, usrId, lisNum);
+        const num = checkObjects.targetNum(usrId);
+        console.log(num);
+        checkObjects.tweetEval(TlList, usrId, num);
       }
     });
   },
@@ -374,7 +376,7 @@ const checkObjects = {
     const blues = replyEl.querySelectorAll('svg');
     if (blues) {
       blues.forEach(blue => {
-        console.log(`blue:${boo}`); //blue.ariaLabel
+        console.log(`blue:${boo}`);
         if (blue.ariaLabel === '認証済みアカウント') {
           //debug.log(DEBUG_LEVEL.INFO, `blue:${usrId}`); //usrId
           boo = 1;
@@ -385,7 +387,7 @@ const checkObjects = {
     return boo;
   },
 
-  tweetEval: function (replyEl, usrId, num) {
+  tweetEval: async function (replyEl, usrId, num) {
     const textCate = checkObjects.tweetTexts(replyEl, usrId);
     const img = checkObjects.imgCheck(replyEl);
     const video = checkObjects.videoCheck(replyEl);
@@ -394,6 +396,7 @@ const checkObjects = {
     debug.log(DEBUG_LEVEL.INFO, `bluecheck(${usrId}:${blue})`);
     const replyT = replyObjects.idCntList[usrId] > zombie_explosion.settings.replyTimes ? 1 : 0;
     const evalPoint = img + video + link;
+    await systemFunc.loadWait("1000")
 
     if (evalPoint === 1 && textCate === 0) {
       switch (true) {
@@ -417,8 +420,19 @@ const checkObjects = {
     systemFunc.idPointList[num].blue = blue;
     systemFunc.idPointList[num].reply = replyT;
     systemFunc.idPointList[num].ratingCalculation();
+  },
+
+  targetNum: function (usrId) {
+    let n = -1; // 初期値を -1 など、見つからなかったことを示す値に設定
+    systemFunc.idPointList.forEach((list, num) => {
+      if (list.id === usrId) {
+        n = num;
+        console.log(`list.id:${list.id} n:${n}`);
+      }
+    });
+    return n;
   }
-};
+}
 
 
 const optionSettings = function () {
