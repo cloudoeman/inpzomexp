@@ -374,7 +374,7 @@ const checkObjects = {
     const blues = replyEl.querySelectorAll('svg');
     if (blues) {
       blues.forEach(blue => {
-        console.log(`blue:${blue.ariaLabel}`); //blue.ariaLabel
+        console.log(`blue:${boo}`); //blue.ariaLabel
         if (blue.ariaLabel === '認証済みアカウント') {
           //debug.log(DEBUG_LEVEL.INFO, `blue:${usrId}`); //usrId
           boo = 1;
