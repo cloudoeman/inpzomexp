@@ -41,7 +41,7 @@ const validate = function () {
       console.log(regexp);
     }
   } catch (err) {
-    status.textContent = err;
+    status.textContent = "Error: Invalid blacklist regex: \"" + regex + "\". Unable to save. Try wrapping it in foward slashes.";
     console.error(err);
     valid = false;
   }
