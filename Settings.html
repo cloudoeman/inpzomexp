@@ -56,16 +56,17 @@
     </div>
     <div class="row">
       <label for="blacklist">
-        >Unicode you want to delete<br />
-        (one per line)<br />
+        >Target language for language point.<br />
         <br />
         <em>
           <a href="https://www.regexpal.com/">Regex</a> is supported.<br />
           Be sure to use the literal notation.<br />
-          ie: /[\u0900-\u097f\u2600-\u26FF]+/
+          ie: [\u0900-\u097f\u2600-\u26FF]+
         </em>
       </label>
-      <textarea id="blacklist" rows="10" cols="50"></textarea>
+      <textarea id="blacklist" rows="10" cols="50" placeholder="[\u0600-\u06FF
+\u0900-\u097f
+\u2600-\u26FF]+"></textarea>
     </div>
   </section>
 
