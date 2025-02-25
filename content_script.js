@@ -24,7 +24,7 @@ const DEBUG_LEVEL = {
 };
 
 const debug = {
-  level: DEBUG_LEVEL.WARN, // 初期レベルを設定
+  level: DEBUG_LEVEL.INFO, // 初期レベルを設定
   log: (level, message, color = 'white') => {
     if (level <= debug.level) {
       if (level === DEBUG_LEVEL.ERROR) {
@@ -145,7 +145,7 @@ const systemFunc = {
 
   debugTest: function () {
     systemFunc.idPointList.forEach((idPoint, num) => {
-      console.group("idPointList details");
+      console.groupCollapsed(`idPointList:${systemFunc.idPointList[num].id}`);
       debug.log(DEBUG_LEVEL.INFO, `num:${num}`);
       debug.log(DEBUG_LEVEL.INFO, `id:${idPoint.id}`);
       debug.log(DEBUG_LEVEL.INFO, `emoji:${idPoint.emoji}`);
@@ -173,12 +173,8 @@ const systemFunc = {
       });
     }
 
-    if (replyObjects.idCntList) {
-      replyObjects.idCntList = {};
-    }
     systemFunc.dataSet(this.tweetsList);
-    console.log(replyObjects.idCntList); //[object Object]になる為
-    console.log(replyObjects.tweetTextList);
+    console.log(replyObjects.tweetTextList);//[object Object]になる為
     deleteObjects.delId();
     systemFunc.debugTest();
     debug.log(DEBUG_LEVEL.INFO, `finished`);
@@ -193,12 +189,10 @@ const systemFunc = {
       if (!usrId) {
         return;
       } else if (!(usrId in replyObjects.tweetTextList)) {
-        this.addar(usrId);
-        this.idPointList[lisNum] = new idPoint(usrId);
-        debug.log(DEBUG_LEVEL.INFO, `created class:${lisNum}:${usrId}`);
-        checkObjects.tweetEval(TlList, usrId, lisNum);
+        this.idPointList.push(new idPoint(usrId));
+        debug.log(DEBUG_LEVEL.INFO, `instance class:${lisNum}:${usrId}`);
+        checkObjects.tweetEval(TlList, usrId, checkObjects.targetNum(usrId));
       } else {
-        this.addar(usrId);
         debug.log(DEBUG_LEVEL.INFO, `RECHECK class:${usrId}`);
         checkObjects.tweetEval(TlList, usrId, checkObjects.targetNum(usrId));
       }
@@ -221,22 +215,12 @@ const systemFunc = {
       }
     }
   },
-
-  addar: function (usrId) {
-    if (usrId in replyObjects.idCntList) {
-      replyObjects.idCntList[usrId]++;
-    } else {
-      replyObjects.idCntList[usrId] = 1;
-    }
-  },
-
 };
 
 
 // リプライ用オブジェクト
 const replyObjects = {
   tweetTextList: {},
-  idCntList: {} //X_id_cnt
 };
 
 
@@ -301,7 +285,7 @@ const checkObjects = {
     }
     if (tlList.querySelector('[data-testid="tweetText"]')) {
       const tweetText = tlList.querySelector('[data-testid="tweetText"]').innerText;
-      replyText = replyText ? replyText + tweetText : tweetText;
+      replyText = replyText ? tweetText + replyText : tweetText;
       textCate = 2;
     }
     if (!replyObjects.tweetTextList[usrId]) {
@@ -344,11 +328,12 @@ const checkObjects = {
   videoCheck: function (replyEl) {
     let boo = false;
     const videos = replyEl.querySelectorAll('img');
-    debug.log(DEBUG_LEVEL.DEBUG, `videos:${videos}`);
+    debug.log(DEBUG_LEVEL.INFO, `videos:${videos}`);
     if (videos) {
       videos.forEach(video => {
-        if (videos.alt === '埋め込み動画') {
-          debug.log(DEBUG_LEVEL.INFO, `video:${videos.src}`); //videos.src
+        if (video.alt === '埋め込み動画') {
+          debug.log(DEBUG_LEVEL.INFO, `videoCheck:${video.src}`); //videos.src
+          debug.log(DEBUG_LEVEL.INFO, `videoCheck:${video}`);
           boo = true;
         }
       });
@@ -414,7 +399,9 @@ const checkObjects = {
       debug.log(DEBUG_LEVEL.INFO, `\"392\"evalPoint:${evalPoint}`);
     }
     systemFunc.idPointList[num].blue = blue;
-    systemFunc.idPointList[num].reply = replyT;
+    if (observeObject.category === 'reply') {
+      systemFunc.idPointList[num].reply = replyT;
+    }
     systemFunc.idPointList[num].ratingCalculation();
   },
 
@@ -423,7 +410,7 @@ const checkObjects = {
     systemFunc.idPointList.forEach((list, num) => {
       if (list.id === usrId) {
         n = num;
-        console.log(`list.id:${list.id} n:${n}`);
+        debug.log(DEBUG_LEVEL.INFO, `list.id:${list.id} n:${n}`);
       }
     });
     return n;
