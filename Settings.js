@@ -11,25 +11,23 @@ const zoexDefault = {
   mixTrendWordP: 3,
   langP: 3,
   replyTimes: 3,
-  blacklist: `[\\u0600-\\u06FF]+
-    [\\u0900-\\u097f\\u2600-\\u26FF]+
-  `.replace(regStrip, ""), // default blacklist
+  blacklist: `[\\u0600-\\u06FF\\u0900-\\u097f\\u2600-\\u26FF]+`.replace(regStrip, ""), // default blacklist
 }
 
 const validate = function () {
   let valid = true;
   const status = document.getElementById("status");
   const blacklist = document.getElementById("blacklist");
-  if (blacklist.value.startsWith("/")) {
+  if (blacklist.value.startsWith("[")) {
     let regex;
     try {
       blacklist.value.split("\n").forEach(match => {
         match = match.replace(regStrip, "");
         regex = regex + match;
       })
-      if (!match.endsWith("/"))
+      if (!match.endsWith("]"))
         throw "invalid regex";
-      regex = regex.replace("/", "")
+      regex = regex.replace(regStrip, "");
       const regexp = new RegExp(regex);
       console.log(regexp);
     } catch (err) {
