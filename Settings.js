@@ -18,10 +18,12 @@ const validate = function () {
   let valid = true;
   const status = document.getElementById("status");
   const blacklist = document.getElementById("blacklist").value;
-  if (blacklist.startsWith("[")) {
-    let regex = "";
-    const n = blacklist.split("\n").length;
-    try {
+  try {
+    if (!blacklist.startsWith("[")) {
+      throw "invalid regex0";
+    } else {
+      let regex = "";
+      const n = blacklist.split("\n").length;
       blacklist.split("\n").forEach((match, num) => {
         if (num >= 1 && !match.startsWith("\\")) {
           console.log(`match: ${match}`);
@@ -37,12 +39,11 @@ const validate = function () {
       regex = regex.replace(regStrip, "");
       const regexp = new RegExp(regex);
       console.log(regexp);
-    } catch (err) {
-      status.textContent = err;
-      console.error(err);
-      valid = false;
-      return valid;
     }
+  } catch (err) {
+    status.textContent = err;
+    console.error(err);
+    valid = false;
   }
   return valid;
 }
