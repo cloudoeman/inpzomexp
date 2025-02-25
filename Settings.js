@@ -17,23 +17,31 @@ const zoexDefault = {
 const validate = function () {
   let valid = true;
   const status = document.getElementById("status");
-  const blacklist = document.getElementById("blacklist");
-  if (blacklist.value.startsWith("[")) {
-    let regex;
+  const blacklist = document.getElementById("blacklist").value;
+  if (blacklist.startsWith("[")) {
+    let regex = "";
+    const n = blacklist.split("\n").length;
     try {
-      blacklist.value.split("\n").forEach(match => {
+      blacklist.split("\n").forEach((match, num) => {
+        if (num >= 1 && !match.startsWith("\\")) {
+          console.log(`match: ${match}`);
+          throw "invalid regex1";
+        }
+        if (num === n - 1 && !match.endsWith("+"))
+          throw "invalid regex2";
         match = match.replace(regStrip, "");
         regex = regex + match;
-      })
-      if (!match.endsWith("]"))
-        throw "invalid regex";
+        console.log(`match: ${match}`);
+        console.log(`regex: ${regex}`);
+      });
       regex = regex.replace(regStrip, "");
       const regexp = new RegExp(regex);
       console.log(regexp);
     } catch (err) {
-      status.textContent = "Error: Invalid blacklist regex: \"" + regex + "\". Unable to save. Try wrapping it in foward slashes.";
+      status.textContent = err;
+      console.error(err);
       valid = false;
-      return;
+      return valid;
     }
   }
   return valid;
@@ -108,8 +116,6 @@ const restoreDefaults = function () {
     }, 1000);
   });
 }
-
-
 
 document.addEventListener("DOMContentLoaded", function () {
   restoreOptions();
