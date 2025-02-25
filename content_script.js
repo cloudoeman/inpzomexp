@@ -24,7 +24,7 @@ const DEBUG_LEVEL = {
 };
 
 const debug = {
-  level: DEBUG_LEVEL.INFO, // 初期レベルを設定
+  level: DEBUG_LEVEL.NONE, // 初期レベルを設定
   log: (level, message, color = 'white') => {
     if (level <= debug.level) {
       if (level === DEBUG_LEVEL.ERROR) {
@@ -57,6 +57,7 @@ const observeObject = {
         this.observer.disconnect();
         debug.log(DEBUG_LEVEL.INFO, `observer was disconnected\n preUrl:${systemFunc.preUrl}`);
         systemFunc.preUrl = undefined;
+        systemFunc.idPointList.length = 0;
         replyObjects.tweetTextList = {};
 
         // reply URL
@@ -167,14 +168,14 @@ const systemFunc = {
 
     if (deleteObjects.delIdList) {
       deleteObjects.delIdList.forEach(idName => {
-        console.log(deleteObjects.delIdList); //[object Object]になる為
+        //console.log(deleteObjects.delIdList); //[object Object]になる為
         debug.log(DEBUG_LEVEL.INFO, `deleted:${idName}`);
         deleteObjects.delTweet(idName);
       });
     }
 
     systemFunc.dataSet(this.tweetsList);
-    console.log(replyObjects.tweetTextList);//[object Object]になる為
+    //console.log(replyObjects.tweetTextList);//[object Object]になる為
     deleteObjects.delId();
     systemFunc.debugTest();
     debug.log(DEBUG_LEVEL.INFO, `finished`);
@@ -276,15 +277,16 @@ const deleteObjects = {
 const checkObjects = {
   EMOJI: /^https:\/\/abs-0.twimg.com\/emoji.*/, //https://abs-0.twimg.com/emoji/v2/svg/1f302.svg
 
-  tweetTexts: function (tlList, usrId) {
+  tweetTexts: function (replyEl, usrId) {
     let textCate = 0;
-    const emojiStr = checkObjects.emojiCheck(tlList);
+    const emojiStr = checkObjects.emojiCheck(replyEl);
     let replyText = emojiStr ? emojiStr : null;
     if (emojiStr) {
       textCate = 1;
     }
-    if (tlList.querySelector('[data-testid="tweetText"]')) {
-      const tweetText = tlList.querySelector('[data-testid="tweetText"]').innerText;
+    const tweetTextEl = replyEl.querySelector('[data-testid="tweetText"]');
+    if (tweetTextEl && tweetTextEl.innerText) {
+      const tweetText = tweetTextEl.innerText;
       replyText = replyText ? tweetText + replyText : tweetText;
       textCate = 2;
     }
@@ -332,8 +334,7 @@ const checkObjects = {
     if (videos) {
       videos.forEach(video => {
         if (video.alt === '埋め込み動画') {
-          debug.log(DEBUG_LEVEL.INFO, `videoCheck:${video.src}`); //videos.src
-          debug.log(DEBUG_LEVEL.INFO, `videoCheck:${video}`);
+          //debug.log(DEBUG_LEVEL.INFO, `videoCheck:${video.src}`); //videos.src
           boo = true;
         }
       });
@@ -367,6 +368,14 @@ const checkObjects = {
       });
     }
     debug.log(DEBUG_LEVEL.INFO, `bluebool:${boo}`);
+    return boo;
+  },
+
+  blacklistCheck: function (text) {
+    const blacklist = zombie_explosion.settings.blacklist;
+    const reg = new RegExp(blacklist);
+    const boo = text.match(reg);
+    debug.log(DEBUG_LEVEL.INFO, `blacklist:${boo}`);
     return boo;
   },
 
