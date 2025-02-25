@@ -10,6 +10,7 @@ const zombie_explosion = {
     mixTrendWordP: 3,
     langP: 3,
     replyTimes: 3,
+    threshold: 5,
     blacklist: '/[\u0900-\u097f\u2600-\u26FF]+/', // default blacklist
   }
 };
@@ -23,7 +24,7 @@ const DEBUG_LEVEL = {
 };
 
 const debug = {
-  level: DEBUG_LEVEL.INFO, // 初期レベルを設定
+  level: DEBUG_LEVEL.WARN, // 初期レベルを設定
   log: (level, message, color = 'white') => {
     if (level <= debug.level) {
       if (level === DEBUG_LEVEL.ERROR) {
@@ -142,7 +143,7 @@ const systemFunc = {
     });
   },
 
-  bebugTest: function () {
+  debugTest: function () {
     systemFunc.idPointList.forEach((idPoint, num) => {
       console.group("idPointList details");
       debug.log(DEBUG_LEVEL.INFO, `num:${num}`);
@@ -179,8 +180,8 @@ const systemFunc = {
     console.log(replyObjects.idCntList); //[object Object]になる為
     console.log(replyObjects.tweetTextList);
     deleteObjects.delId();
+    systemFunc.debugTest();
     debug.log(DEBUG_LEVEL.INFO, `finished`);
-    //systemFunc.bebugTest();
   },
 
   dataSet: function (TlLists) {
@@ -198,10 +199,8 @@ const systemFunc = {
         checkObjects.tweetEval(TlList, usrId, lisNum);
       } else {
         this.addar(usrId);
-        debug.log(DEBUG_LEVEL.INFO, `recheck class:${usrId}`);
-        const num = checkObjects.targetNum(usrId);
-        console.log(`list number${num}`);
-        checkObjects.tweetEval(TlList, usrId, num);
+        debug.log(DEBUG_LEVEL.INFO, `RECHECK class:${usrId}`);
+        checkObjects.tweetEval(TlList, usrId, checkObjects.targetNum(usrId));
       }
     });
   },
@@ -265,10 +264,10 @@ const deleteObjects = {
   delIdList: [],
 
   delId: function () {
-    Object.keys(replyObjects.idCntList).forEach(idName => {
-      if (replyObjects.idCntList[idName] >= this.REPLYTIME) {
-        debug.log(DEBUG_LEVEL.INFO, `delID:${idName}`);
-        this.delTweet(idName);
+    systemFunc.idPointList.forEach((idList) => {
+      if (idList.totalPoint >= zombie_explosion.settings.threshold) {
+        const idName = idList.id;
+        deleteObjects.delTweet(idName);
         if (!this.delIdList.includes(idName)) {
           this.delIdList.push(idName);
         }
@@ -376,7 +375,6 @@ const checkObjects = {
     const blues = replyEl.querySelectorAll('svg');
     if (blues) {
       blues.forEach(blue => {
-        console.log(`blue:${boo}`);
         if (blue.ariaLabel === '認証済みアカウント') {
           //debug.log(DEBUG_LEVEL.INFO, `blue:${usrId}`); //usrId
           boo = 1;
@@ -393,7 +391,7 @@ const checkObjects = {
     const video = checkObjects.videoCheck(replyEl);
     const link = checkObjects.linkCheck(replyEl);
     const blue = checkObjects.blueCheck(replyEl);
-    const replyT = replyObjects.idCntList[usrId] > zombie_explosion.settings.replyTimes ? 1 : 0;
+    const replyT = replyObjects.tweetTextList[usrId].length > zombie_explosion.settings.replyTimes ? 1 : 0;
     const evalPoint = img + video + link;
 
     if (evalPoint === 1 && textCate === 0) {
