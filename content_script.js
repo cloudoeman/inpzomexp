@@ -2,16 +2,16 @@ const zombie_explosion = {
   settings: {
     enabled: true, // default enabled
     emojiP: 3,
-    imgP: 1,
-    videoP: 1,
-    linkP: 1,
-    blueP: 1,
-    replyP: 3,
-    mixTrendWordP: 3,
-    langP: 3,
+    imgP: 3,
+    videoP: 3,
+    linkP: 3,
+    blueP: 2,
+    replyP: 2,
+    mixTrendWordP: 5,
+    langP: 5,
     replyTimes: 3,
     threshold: 5,
-    blacklist: '/[\u0900-\u097f\u2600-\u26FF]+/', // default blacklist
+    blacklist: `[\\u0600-\\u06FF\\u0900-\\u097f\\u2600-\\u26FF]+`, // default blacklist
   }
 };
 
@@ -24,7 +24,7 @@ const DEBUG_LEVEL = {
 };
 
 const debug = {
-  level: DEBUG_LEVEL.NONE, // 初期レベルを設定
+  level: DEBUG_LEVEL.INFO, // 初期レベルを設定
   log: (level, message, color = 'white') => {
     if (level <= debug.level) {
       if (level === DEBUG_LEVEL.ERROR) {
@@ -373,8 +373,8 @@ const checkObjects = {
 
   blacklistCheck: function (text) {
     const blacklist = zombie_explosion.settings.blacklist;
-    const reg = new RegExp(blacklist);
-    const boo = text.match(reg);
+    const reg = new RegExp(blacklist, 'u');
+    const boo = reg.test(text);
     debug.log(DEBUG_LEVEL.INFO, `blacklist:${boo}`);
     return boo;
   },
@@ -408,6 +408,11 @@ const checkObjects = {
       debug.log(DEBUG_LEVEL.INFO, `\"392\"evalPoint:${evalPoint}`);
     }
     systemFunc.idPointList[num].blue = blue;
+    replyObjects.tweetTextList[usrId].forEach(text => {
+      if (checkObjects.blacklistCheck(text)) {
+        systemFunc.idPointList[num].lang = 1;
+      }
+    });
     if (observeObject.category === 'reply') {
       systemFunc.idPointList[num].reply = replyT;
     }

@@ -3,13 +3,13 @@ const regStrip = /^[\r\t\f\v ]+|[\r\t\f\v ]+$/gm;
 const zoexDefault = {
   enabled: true, // default enabled
   emojiP: 3,
-  imgP: 1,
-  videoP: 1,
-  linkP: 1,
-  blueP: 1,
-  replyP: 3,
-  mixTrendWordP: 3,
-  langP: 3,
+  imgP: 3,
+  videoP: 3,
+  linkP: 3,
+  blueP: 2,
+  replyP: 2,
+  mixTrendWordP: 5,
+  langP: 5,
   replyTimes: 3,
   blacklist: `[\\u0600-\\u06FF\\u0900-\\u097f\\u2600-\\u26FF]+`.replace(regStrip, ""), // default blacklist
 }
